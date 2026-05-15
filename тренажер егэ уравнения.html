@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ЕГЭ Тренажёр — Уравнения</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Arial', sans-serif;
+        }
+        body {
+            background: #f1f5f9;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: auto;
+        }
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            color: #0f172a;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            margin: 20px 0 10px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+        }
+        select, button, input {
+            padding: 10px 16px;
+            font-size: 1rem;
+            border-radius: 60px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            cursor: pointer;
+        }
+        button {
+            background: #1e293b;
+            color: white;
+            border: none;
+            font-weight: 600;
+            transition: 0.15s;
+        }
+        button:hover {
+            background: #0f172a;
+            transform: scale(0.97);
+        }
+        .task {
+            font-size: 1.7rem;
+            font-weight: 500;
+            background: #f8fafc;
+            padding: 24px 20px;
+            border-radius: 36px;
+            text-align: center;
+            margin: 20px 0;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+        .answer-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin: 15px 0;
+        }
+        input {
+            flex: 2;
+            min-width: 160px;
+            border-radius: 60px;
+        }
+        .result-badge {
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .correct {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .wrong {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-weight: 500;
+        }
+        .timer {
+            font-size: 1.3rem;
+            background: #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-family: monospace;
+        }
+        hr {
+            margin: 20px 0;
+        }
+        .solution-text {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 20px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>📐 Тренажёр ЕГЭ: уравнения</h1>
+        <div class="flex-row">
+            <div class="control-group">
+                <label>🎮 Режим</label>
+                <select id="modeSelect">
+                    <option value="practice">🔄 Тренировка (бесконечно)</option>
+                    <option value="exam">⏱️ Экзамен (10 задач | 10 мин)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>📚 Тип уравнений</label>
+                <select id="typeSelect">
+                    <option value="mix">🎲 Смешанные (ЕГЭ‑стиль)</option>
+                    <option value="quadratic">🧮 Квадратные</option>
+                    <option value="log">🔢 Логарифмические</option>
+                    <option value="exp">⚡ Показательные</option>
+                    <option value="irr">√ Иррациональные</option>
+                    <option value="trig">📐 Тригонометрические (в градусах)</option>
+                </select>
+            </div>
+            <button id="startBtn">▶ Начать / Сброс</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div id="taskDisplay" class="task">🏁 Нажми «Начать»</div>
+        <div class="answer-area">
+            <input type="number" id="answerInput" placeholder="Введите число (целое или десятичное)" step="any">
+            <button id="checkBtn">✅ Проверить</button>
+            <button id="hintBtn">💡 Подсказка</button>
+            <button id="solutionBtn">📖 Решение</button>
+        </div>
+        <div id="resultMsg"></div>
+        <div id="hintMsg" style="margin-top: 12px; font-style: italic; color: #2d3e50;"></div>
+        <div id="solutionMsg" class="solution-text"></div>
+        <hr>
+        <div class="stats">
+            <span>📋 Заданий: <strong id="totalCount">0</strong></span>
+            <span>✅ Верно: <strong id="correctCount">0</strong></span>
+            <span>🎯 Точность: <strong id="accuracyStat">0%</strong></span>
+            <span id="timerSpan" class="timer">⏱️ —</span>
+        </div>
+    </div>
+    <footer>Правильные ответы округляются до сотых. Тригонометрия — в градусах.</footer>
+</div>
+
+<script>
+    // ------ БИБЛИОТЕКА ГЕНЕРАЦИИ (без ошибок) ------
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const roundTo = (val, decimals = 2) => Number(val.toFixed(decimals));
+
+    function generateQuadratic() {
+        let root = rand(2, 12);
+        let sign = rand(1, 2) === 1 ? 1 : -1;
+        let rootVal = sign * root;
+        let x2coeff = 1;
+        let term = -2 * rootVal;
+        let constTerm = rootVal * rootVal;
+        let equation = `x² ${term >= 0 ? '+' : '-'} ${Math.abs(term)}x ${constTerm >= 0 ? '+' : '-'} ${Math.abs(constTerm)} = 0`;
+        let answer = rootVal;
+        let solution = `Квадратное уравнение (x − ${rootVal})² = 0 → x = ${rootVal}`;
+        let hint = `Сверните по формуле (x − a)² = 0 или решите дискриминантом.`;
+        return {q: equation, ans: answer, sol: solution, hint: hint};
+    }
+
+    function generateLog() {
+        let base = rand(2, 4);
+        let arg = rand(2, 8);
+        let answer = Math.pow(base, arg);
+        let equation = `log_${base}(${answer}) = ${arg}`;
+        let solution = `По определению: ${base}^${arg} = ${answer} → x = ${answer}`;
+        let hint = `Логарифм: log_a(b) = c  →  a^c = b`;
+        return {q: equation, ans: answer, sol: solution, hint: hint};
+    }
+
+    function generateExp() {
+        let expVal = rand(2, 6);
+        let shift = rand(1, 3);
+        let rhs = Math.pow(2, expVal + shift);
+        let equation = `2^{x + ${shift}} = ${rhs}`;
+        let answer = expVal;
+        let solution = `2^{x+${shift}} = 2^{${expVal+shift}} → x+${shift} = ${expVal+shift} → x = ${expVal}`;
+        let hint = `Представьте правую часть как степень двойки.`;
+        return {q: equation, ans: answer, sol: solution, hint: hint};
+    }
+
+    function generateIrr() {
+        let inside = rand(2, 20);
+        let rootVal = Math.sqrt(inside);
+        if (!Number.isInteger(rootVal)) return generateIrr();
+        let xVal = rand(2, 12);
+        let equation = `√(x + ${inside - xVal}) = ${rootVal}`;
+        let answer = xVal;
+        let solution = `Возводим в квадрат: x + ${inside - xVal} = ${inside} → x = ${xVal}`;
+        let hint = `Изолируйте корень и возведите в квадрат.`;
+        return {q: equation, ans: answer, sol: solution, hint: hint};
+    }
+
+    function generateTrig() {
+        let angles = [30, 45, 60, 0, 90];
+        let ang = angles[rand(0, angles.length-1)];
+        if(ang === 0) ang = 180;
+        if(ang === 90) ang = 90;
+        let equation = `sin(x°) = sin(${ang}°) , x ∈ (0°; 90°]`;
+        let answer = ang;
+        let solution = `На единичной окружности первый положительный угол: ${ang}°`;
+        let hint = `Синусы равны, если углы равны (в первой четверти).`;
+        if(ang === 180) {
+            equation = `cos(x°) = cos(180°) , x в [0°; 180°]`;
+            answer = 180;
+            solution = `cos(180°) = -1 → x = 180°`;
+            hint = `Косинус 180° = -1.`;
+        }
+        return {q: equation, ans: answer, sol: solution, hint: hint};
+    }
+
+    function generateMixed() {
+        let r = rand(1,5);
+        if(r===1) return generateQuadratic();
+        if(r===2) return generateLog();
+        if(r===3) return generateExp();
+        if(r===4) return generateIrr();
+        return generateTrig();
+    }
+
+    function getTaskByType(type) {
+        switch(type) {
+            case 'quadratic': return generateQuadratic();
+            case 'log': return generateLog();
+            case 'exp': return generateExp();
+            case 'irr': return generateIrr();
+            case 'trig': return generateTrig();
+            default: return generateMixed();
+        }
+    }
+
+    // ------ ГЛОБАЛЬНОЕ СОСТОЯНИЕ ------
+    let currentTask = null;
+    let currentAnswer = null;
+    let tasksTotal = 0;
+    let tasksCorrect = 0;
+    let examMode = false;
+    let examRemaining = 0;
+    let examTasksList = [];
+    let examIndex = 0;
+    let timerInterval = null;
+    let timeLeftSec = 0;
+
+    const modeSelect = document.getElementById('modeSelect');
+    const typeSelect = document.getElementById('typeSelect');
+    const startBtn = document.getElementById('startBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const hintBtn = document.getElementById('hintBtn');
+    const solutionBtn = document.getElementById('solutionBtn');
+    const taskDisplay = document.getElementById('taskDisplay');
+    const answerInput = document.getElementById('answerInput');
+    const resultMsgDiv = document.getElementById('resultMsg');
+    const hintMsgDiv = document.getElementById('hintMsg');
+    const solutionMsgDiv = document.getElementById('solutionMsg');
+    const totalSpan = document.getElementById('totalCount');
+    const correctSpan = document.getElementById('correctCount');
+    const accuracySpan = document.getElementById('accuracyStat');
+    const timerSpan = document.getElementById('timerSpan');
+
+    function stopTimer() {
+        if(timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+
+    function updateStatsUI() {
+        totalSpan.innerText = tasksTotal;
+        correctSpan.innerText = tasksCorrect;
+        let acc = tasksTotal === 0 ? 0 : Math.round((tasksCorrect / tasksTotal) * 100);
+        accuracySpan.innerText = acc + '%';
+    }
+
+    function showNewTask(task) {
+        currentTask = task;
+        currentAnswer = task.ans;
+        taskDisplay.innerText = `📐 ${task.q}`;
+        answerInput.value = '';
+        resultMsgDiv.innerHTML = '';
+        hintMsgDiv.innerHTML = '';
+        solutionMsgDiv.innerHTML = '';
+    }
+
+    function loadTaskFromExam() {
+        if(examIndex >= examTasksList.length) {
+            taskDisplay.innerText = '✅ Экзамен окончен!';
+            checkBtn.disabled = true;
+            hintBtn.disabled = true;
+            solutionBtn.disabled = true;
+            answerInput.disabled = true;
+            stopTimer();
+            timerSpan.innerText = '⏱️ 0:00';
+            return;
+        }
+        const t = examTasksList[examIndex];
+        currentTask = t;
+        currentAnswer = t.ans;
+        taskDisplay.innerText = `[${examIndex+1}/${examTasksList.length}] ${t.q}`;
+        answerInput.value = '';
+        resultMsgDiv.innerHTML = '';
+        hintMsgDiv.innerHTML = '';
+        solutionMsgDiv.innerHTML = '';
+    }
+
+    function generateNewPractice() {
+        let selectedType = typeSelect.value;
+        const newTask = getTaskByType(selectedType);
+        showNewTask(newTask);
+    }
+
+    function checkAnswer() {
+        if(!currentTask) return;
+        let userValue = parseFloat(answerInput.value);
+        if(isNaN(userValue)) {
+            resultMsgDiv.innerHTML = '<span class="result-badge wrong">❌ Введите число</span>';
+            return;
+        }
+        let correctVal = currentAnswer;
+        let epsilon = 0.001;
+        let isCorrect = Math.abs(userValue - correctVal) < epsilon;
+        if(isCorrect) {
+            tasksCorrect++;
+            resultMsgDiv.innerHTML = '<span class="result-badge correct">✔ Правильно!</span>';
+        } else {
+            resultMsgDiv.innerHTML = `<span class="result-badge wrong">✘ Ошибка. Верный ответ: ${correctVal}</span>`;
+        }
+        tasksTotal++;
+        updateStatsUI();
+
+        if(examMode) {
+            examIndex++;
+            if(examIndex < examTasksList.length) {
+                loadTaskFromExam();
+            } else {
+                loadTaskFromExam(); // покажет конец экзамена
+                checkBtn.disabled = true;
+                hintBtn.disabled = true;
+                solutionBtn.disabled = true;
+                stopTimer();
+            }
+        } else {
+            generateNewPractice();
+        }
+    }
+
+    function startExam() {
+        stopTimer();
+        let selectedType = typeSelect.value;
+        let tasksArr = [];
+        for(let i=0; i<10; i++) {
+            tasksArr.push(getTaskByType(selectedType));
+        }
+        examTasksList = tasksArr;
+        examIndex = 0;
+        tasksTotal = 0;
+        tasksCorrect = 0;
+        updateStatsUI();
+        examMode = true;
+        timeLeftSec = 600; // 10 минут
+        timerSpan.innerText = `⏱️ ${Math.floor(timeLeftSec/60)}:${(timeLeftSec%60).toString().padStart(2,'0')}`;
+        stopTimer();
+        timerInterval = setInterval(() => {
+            if(timeLeftSec <= 0) {
+                stopTimer();
+                timerSpan.innerText = '⏱️ 0:00';
+                taskDisplay.innerText = '⌛ Время вышло!';
+                checkBtn.disabled = true;
+                hintBtn.disabled = true;
+                solutionBtn.disabled = true;
+                answerInput.disabled = true;
+            } else {
+                timeLeftSec--;
+                let mins = Math.floor(timeLeftSec/60);
+                let secs = timeLeftSec%60;
+                timerSpan.innerText = `⏱️ ${mins}:${secs.toString().padStart(2,'0')}`;
+            }
+        }, 1000);
+        loadTaskFromExam();
+        checkBtn.disabled = false;
+        hintBtn.disabled = false;
+        solutionBtn.disabled = false;
+        answerInput.disabled = false;
+    }
+
+    function startPractice() {
+        stopTimer();
+        examMode = false;
+        tasksTotal = 0;
+        tasksCorrect = 0;
+        updateStatsUI();
+        timerSpan.innerText = '⏱️ тренировка';
+        let firstTask = getTaskByType(typeSelect.value);
+        showNewTask(firstTask);
+        checkBtn.disabled = false;
+        hintBtn.disabled = false;
+        solutionBtn.disabled = false;
+        answerInput.disabled = false;
+    }
+
+    function startHandler() {
+        if(modeSelect.value === 'exam') {
+            startExam();
+        } else {
+            startPractice();
+        }
+    }
+
+    function showHint() {
+        if(currentTask && currentTask.hint) {
+            hintMsgDiv.innerHTML = `💡 Подсказка: ${currentTask.hint}`;
+        } else if(currentTask) {
+            hintMsgDiv.innerHTML = `💡 Попробуйте привести уравнение к базовому виду.`;
+        }
+    }
+
+    function showSolution() {
+        if(currentTask && currentTask.sol) {
+            solutionMsgDiv.innerHTML = `📘 Решение: ${currentTask.sol}`;
+        } else if(currentTask) {
+            solutionMsgDiv.innerHTML = `📘 Решение: правильный ответ = ${currentAnswer}`;
+        }
+    }
+
+    startBtn.addEventListener('click', startHandler);
+    checkBtn.addEventListener('click', checkAnswer);
+    hintBtn.addEventListener('click', showHint);
+    solutionBtn.addEventListener('click', showSolution);
+    
+    // первоначальная инициализация
+    startPractice();
+</script>
+</body>
+</html>
